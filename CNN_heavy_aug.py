@@ -1,5 +1,5 @@
 
-# %% Import Libraries
+# Import Libraries
 import os
 from keras.preprocessing.image import ImageDataGenerator
 import sys
@@ -20,19 +20,20 @@ import numpy as np
 import time
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
+from config import Config
 
 print("Libraries Imported")
 
-img_size = 128
-batch_size = 64
-training_size = 10551
-validation_size = 5640
+Config.IMG_SIZE = 128
+Config.BATCH_SIZE = 64
+Config.TRAINING_SIZE = 10551
+Config.VALIDATION_SIZE = 5640
 #class_weight = {0: 3.6146969696969697, 1: 0.5802646300530233}
 #class_weight = {0:400, 1:0.8}
-class_weight = {0:80, 1:1}
-nbEPOCHS = 150
+Config.CLASS_WEIGHT = {0:80, 1:1}
+Config.NBEPOCHS = 150
 #lr = 0.0000353
-lr = 0.000353
+Config.LR = 0.000353
 #lr = 0.00062729
 
 def get_augmented_train_data(path):
@@ -43,8 +44,8 @@ def get_augmented_train_data(path):
 
         train_generator = train_datagen.flow_from_directory(
                 path + '/Training_data_for_tiles',
-                target_size=(img_size, img_size),
-                batch_size=batch_size,
+                target_size=(Config.IMG_SIZE, Config.IMG_SIZE),
+                batch_size=Config.BATCH_SIZE,
                 class_mode='binary')
         return train_generator
 
@@ -53,8 +54,8 @@ def get_train_data(path):
 
         train_generator = train_datagen.flow_from_directory(
                 path + '/Training_data_for_tiles',
-                target_size=(img_size, img_size),
-                batch_size=batch_size,
+                target_size=(Config.IMG_SIZE, Config.IMG_SIZE),
+                batch_size=Config.BATCH_SIZE,
                 class_mode='binary')
         return train_generator
 
@@ -64,8 +65,8 @@ def get_validation_data(path):
 
         validation_generator = validation_datagen.flow_from_directory(
                 path + '/Validation_data_for_tiles',
-                target_size=(img_size, img_size),
-                batch_size=batch_size,
+                target_size=(Config.IMG_SIZE, Config.IMG_SIZE),
+                batch_size=Config.BATCH_SIZE,
                 class_mode='binary')
         return validation_generator
 
@@ -75,7 +76,7 @@ def define_model():
 
     # first conv block
     model.add(Conv2D(128, (3, 3), activation = LeakyReLU(), kernel_initializer='he_uniform', padding='same',
-                     input_shape=(img_size, img_size, 3)))
+                     input_shape=(Config.IMG_SIZE, Config.IMG_SIZE, 3)))
     #model.add(Conv2D(96, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(BatchNormalization())
     model.add(MaxPooling2D((2, 2)))
@@ -145,9 +146,9 @@ def run_test_harness():
     callback = EarlyStopping(monitor='loss', patience=45)
     # start time and fit model
     start = time.time()
-    history = model.fit(train_data, epochs=nbEPOCHS, batch_size=batch_size, 
-                        steps_per_epoch=training_size/batch_size, validation_data=validation_data, 
-                        validation_steps=validation_size/batch_size, callbacks=[callback], class_weight=class_weight, verbose=1)
+    history = model.fit(train_data, epochs=Config.NBEPOCHS, batch_size=Config.BATCH_SIZE, 
+                        steps_per_epoch=Config.TRAINING_SIZE/Config.BATCH_SIZE, validation_data=validation_data, 
+                        validation_steps=Config.VALIDATION_SIZE/Config.BATCH_SIZE, callbacks=[callback], class_weight=Config.CLASS_WEIGHT, verbose=1)
     end = time.time()
     print('Training time (mins):', (end - start) / 60)
     print('Training time (hrs):', (end - start) / (60*60))
