@@ -24,18 +24,6 @@ from config import Config
 
 print("Libraries Imported")
 
-Config.IMG_SIZE = 128
-Config.BATCH_SIZE = 64
-Config.TRAINING_SIZE = 10551
-Config.VALIDATION_SIZE = 5640
-#class_weight = {0: 3.6146969696969697, 1: 0.5802646300530233}
-#class_weight = {0:400, 1:0.8}
-Config.CLASS_WEIGHT = {0:80, 1:1}
-Config.NBEPOCHS = 150
-#lr = 0.0000353
-Config.LR = 0.000353
-#lr = 0.00062729
-
 def get_augmented_train_data(path):
         train_datagen = ImageDataGenerator(
                 rescale=1./255,rotation_range=20, width_shift_range=0.06,
@@ -109,7 +97,7 @@ def define_model():
     model.add(Dropout(0.3))
     model.add(Dense(1, activation='sigmoid'))
     # compile model
-    opt = Adam(learning_rate=lr)
+    opt = Adam(learning_rate=Config.LR)
     model.compile(optimizer=opt, loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
